@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Passport\HasApiTokens;
 
 
@@ -43,6 +44,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    protected $appends = ['Photo'];
 
     /**
      * The attributes that should be cast.
@@ -60,6 +62,14 @@ class User extends Authenticatable
 
     public function socialMedia() {
         return $this->belongsToMany(SocialMedia::class,'user_social_media')
-            ->withPivot('followers','url');;
+            ->withPivot('followers','url');
+    }
+
+    public function getPhotoAttribute() {
+        return  $this->avatar ? config('app.url') . Storage::url($this->avatar) : asset('imgs/logo-white.svg') ;
+    }
+
+    public function likes() {
+        return $this->hasMany(Like::class);
     }
 }

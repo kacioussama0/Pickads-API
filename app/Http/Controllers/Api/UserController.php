@@ -36,6 +36,7 @@ class UserController extends Controller
     }
 
     public function updateProfile(Request $request) {
+
         $user = auth()->user();
 
         $validatedData = $request->validate([
@@ -46,7 +47,8 @@ class UserController extends Controller
             'email' => 'required|max:128|unique:users,email,' . auth()->id(),
             'description' => 'max: 255',
             'gender' => 'required',
-            'mobile' => 'min:11|max:13'
+            'category_id' => 'required',
+            'mobile' => 'max:13'
         ]);
 
         $updateUser = $user -> update($validatedData);
@@ -60,31 +62,49 @@ class UserController extends Controller
 
     public function updateAvatar(Request $request) {
 
-
         $validateData = $request->validate([
             'avatar' => 'required|max:5120|file|mimes:jpg,png,webp,gif'
         ]);
-        $name = time() . '-small.' . $request->avatar->extension() ;
+
+        $username = auth()->user()->username;
+
+        $originalName = $username . '-original.' . $request->avatar->extension();
+        $smallName = $username . '-small.' . $request->avatar->extension();
+        $mediumName = $username . '-medium.' . $request->avatar->extension();
+        $largeName = $username . '-large.' . $request->avatar->extension();
 
         $path = 'storage/users/' . 'avatars/'. auth()->id() . '/';
+
+        Storage::deleteDirectory('public/users/avatars/'. auth()->id());
+
         $usersPath = 'public/users/';
         $avatarPath = 'avatars/';
 
         $user = auth()->user();
 
-         Storage::makeDirectory($usersPath);
-         Storage::makeDirectory($usersPath . $avatarPath);
-         Storage::makeDirectory($usersPath . $avatarPath . auth()->id());
-
+        Storage::makeDirectory($usersPath);
+        Storage::makeDirectory($usersPath . $avatarPath);
+        Storage::makeDirectory($usersPath . $avatarPath . auth()->id());
 
 
         ResizeImage::make($request->file('avatar'))
-            ->resize(180, 180)
-            ->save($path . $name);
+            ->resize(150, 150)
+            ->save($path . $smallName);
+
+        ResizeImage::make($request->file('avatar'))
+            ->save($path . $originalName);
+
+        ResizeImage::make($request->file('avatar'))
+            ->resize(300, 300)
+            ->save($path . $mediumName);
+
+        ResizeImage::make($request->file('avatar'))
+            ->resize(1024, 1024)
+            ->save($path . $largeName);
 
         Storage::delete('public/' . $user -> avatar);
 
-        $user -> avatar = 'users/' . 'avatars/'. auth()->id() . '/' . $name;
+        $user -> avatar = 'users/' . 'avatars/'. auth()->id() . '/' . $originalName;
 
         if($user->save()) {
             return response()->json(['message' => 'avatar updated successfully'],200);
@@ -102,5 +122,11 @@ class UserController extends Controller
         $user = User::where('username',$username)->first();
         return new UserResource($user);
     }
+
+    public function user() {
+        return new UserResource(auth()->user());
+    }
+
+
 
 }

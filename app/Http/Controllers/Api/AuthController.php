@@ -17,6 +17,8 @@ class AuthController extends Controller
 {
     public function register(Request $request) {
 
+
+
         $validatedData = $request->validate([
             'first_name' => 'required|max:35',
             'last_name' => 'required|max:35',
@@ -26,25 +28,32 @@ class AuthController extends Controller
             'email' => 'required|max:128|unique:users',
             'password' => 'required|confirmed',
             'password_confirmation' => 'required',
-            'description' => 'max: 255',
-            'type' => 'required',
+            'description' => 'max:255',
             'gender' => 'required',
             'avatar' => 'mimes:jpg,gif,png,svg,webp',
-            'mobile' => 'min:11|max:13'
+            'mobile' => 'max:13'
         ]);
 
-        $validatedData['is_banned'] = false;
-        $validatedData['password'] = bcrypt($validatedData['password']);
+        $social_medias = json_decode($request->social_media);
 
-        if($request->hasFile('avatar')) {
-            $validatedData['avatar'] = $request->file('avatar')->store('avatars','public');
-        }
+        $validatedData['is_banned'] = false;
+        $validatedData['username'] = strtolower(trim($validatedData['username']));
+        $validatedData['password'] = bcrypt($validatedData['password']);
 
         $user = Category::findOrFail($validatedData['category_id'])->users()->create($validatedData);
 
-        $accessToken = $user -> createToken('authToken')->accessToken;
+
 
         if($user) {
+
+            $accessToken = $user ->createToken('authToken')->accessToken;
+
+            foreach ($social_medias as $social_media) {
+                $user->socialMedia()->attach($social_media->social_media_id,[
+                    'followers' => $social_media->info->followers,
+                    'url' => $social_media->info->url
+                ]);
+            }
 
             $userDetails = [
                 'username' => $user->username,
@@ -82,11 +91,16 @@ class AuthController extends Controller
         }
 
         $user = auth()->user();
+
+        if($user['is_banned']) {
+            return response()->json(['message' => 'You Account Is Restricted'],401);
+        }
+
         $accessToken = $user ->createToken('authToken')->accessToken;
 
         return response()->json([
             'message' => 'logged successfully',
-            'user' => $user,
+            'user' => new UserResource($user),
             'access_token' => $accessToken
         ]);
     }
@@ -111,7 +125,7 @@ class AuthController extends Controller
             'token' => $token
         ]);
 
-        Mail::send('emails.forget',[],function ($message) use ($request) {
+        Mail::send('emails.forget',['token' => $token],function ($message) use ($request) {
             $message->subject('Password Reset For Your Account');
             $message->from('contact@pickads.net');
             $message->to($request->email);
