@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\SocialMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -43,9 +44,16 @@ class SocialMediaController extends Controller
 
     }
 
-    public function show(SocialMedia $socialMedia)
+    public function show($socialMedia, Request $request)
     {
-        //
+        $socialUsers = SocialMedia::findOrFail($socialMedia)->users;
+
+        if(!empty($request->followersFrom) && !empty($request->followersTo)) {
+            $socialUsers = SocialMedia::findOrFail($socialMedia)->users()->where('followers','>=',$request->followersFrom)->where('followers','<=' , $request->followersTo)->get();
+
+        }
+
+        return UserResource::collection($socialUsers);
     }
 
 

@@ -14,22 +14,17 @@ class SiteController extends Controller
     public function influencers(Request $request) {
 
         $influencers = User::where('is_banned',0)->latest()->paginate(20);
-
-        $category = $request->input('category');
+        $socialMedias = $request->input('social');
         $search = $request->input('search');
-        $followers = $request->input('followers');
 
         if(!empty($search)) {
           $influencers = User::where('is_banned',0)->where('first_name','LIKE',"%$search%")->orWhere('last_name','LIKE',"%$search%")->latest()->paginate(20);
         }
 
-        if(!empty($category)) {
-            $influencers = Category::findOrFail($category)->users;
+        if(!empty($socialMedias)) {
+            $influencers = SocialMedia::findOrFail($socialMedias)->users;
         }
 
-        if(!empty($followers)) {
-            $influencers = SocialMedia::all()->user();
-        }
 
         return UserResource::collection($influencers);
     }

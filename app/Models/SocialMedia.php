@@ -14,7 +14,7 @@ class SocialMedia extends Model
         'logo'
     ];
 
-    public function user() {
+    public function users() {
         return $this->belongsToMany(User::class,'user_social_media')
             ->withPivot('followers','url');
     }
