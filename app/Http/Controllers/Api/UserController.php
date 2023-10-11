@@ -28,7 +28,7 @@ class UserController extends Controller
 
         $user -> password = bcrypt($validatedData['new_password']);
 
-        if($user -> save()) {
+        if($user->save()) {
             return response()->json(['message' => 'password updated successfully'],200);
         }
 

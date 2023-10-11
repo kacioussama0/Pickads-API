@@ -9,6 +9,8 @@ Route::post('/forget-password',[\App\Http\Controllers\Api\AuthController::class,
 Route::post('/password/reset',[\App\Http\Controllers\Api\AuthController::class,'resetPassword']);
 Route::get('/influencers',[\App\Http\Controllers\Api\SiteController::class,'influencers']);
 Route::post('/put-like',[\App\Http\Controllers\Api\LikeController::class,'like']);
+Route::get('/who-like/{fingerprint}',[\App\Http\Controllers\Api\SiteController::class,'whoLike']);
+
 
 Route::middleware('auth:api')->prefix('user')->group(function() {
     Route::post('update/password',[\App\Http\Controllers\Api\UserController::class,'updatePassword']);

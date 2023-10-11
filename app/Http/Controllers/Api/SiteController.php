@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LikeResource;
 use App\Http\Resources\UserResource;
 use App\Models\Category;
+use App\Models\Like;
 use App\Models\SocialMedia;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,7 +27,11 @@ class SiteController extends Controller
             $influencers = SocialMedia::findOrFail($socialMedias)->users;
         }
 
-
         return UserResource::collection($influencers);
+    }
+
+    public function whoLike($fingerprint) {
+        $likes = Like::where('fingerprint',$fingerprint)->latest()->get();
+        return LikeResource::collection($likes);
     }
 }
