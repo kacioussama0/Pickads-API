@@ -13,11 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/influencers', [App\Http\Controllers\HomeController::class, 'influencers'])->name('influencers');
-
-Route::resource('ads', \App\Http\Controllers\AdController::class);
-Route::resource('categories', \App\Http\Controllers\CategoryController::class);
-Route::resource('social-media', \App\Http\Controllers\SocialMediaController::class);
+Route::middleware(['basicAuth'])->group(function () {
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/influencers', [App\Http\Controllers\HomeController::class, 'influencers'])->name('influencers');
+    Route::resource('ads', \App\Http\Controllers\AdController::class)->middleware('');
+    Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+    Route::resource('social-media', \App\Http\Controllers\SocialMediaController::class);
+}
+);
