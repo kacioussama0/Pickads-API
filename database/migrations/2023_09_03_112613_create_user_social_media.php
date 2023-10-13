@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('social_media_id');
             $table->foreign('social_media_id')->references('id')
                 ->on('social_media')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->decimal('followers');
+            $table->unsignedDouble('followers');
             $table->string('url');
 
         });
