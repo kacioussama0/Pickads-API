@@ -66,7 +66,7 @@ class User extends Authenticatable
     }
 
     public function getPhotoAttribute() {
-        return  $this->avatar ? config('app.url') . Storage::url($this->avatar) : asset('imgs/logo-white.svg') ;
+        return  $this->avatar ? config('app.url') . Storage::url($this->avatar) : asset('imgs/logo-profile.svg') ;
     }
 
     public function likes() {

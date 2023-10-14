@@ -86,7 +86,6 @@ class UserController extends Controller
         Storage::makeDirectory($usersPath . $avatarPath);
         Storage::makeDirectory($usersPath . $avatarPath . auth()->id());
 
-
         ResizeImage::make($request->file('avatar'))
             ->resize(150, 150)
             ->save($path . $smallName);

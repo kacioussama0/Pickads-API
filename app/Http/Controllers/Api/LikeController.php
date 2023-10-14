@@ -16,7 +16,7 @@ class LikeController extends Controller
            "user_id" => "required"
         ]);
 
-        $like = Like::where('fingerprint',$validatedData['fingerprint'])->where("user_id",$validatedData['user_id'])->first();
+        $like = Like::where('fingerprint',$validatedData['fingerprint'])->where('user_agent',$validatedData['user_agent'])->where("user_id",$validatedData['user_id'])->first();
 
         if($like) {
             return response()->json([
