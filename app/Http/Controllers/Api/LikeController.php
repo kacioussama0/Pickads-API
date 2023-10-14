@@ -37,4 +37,27 @@ class LikeController extends Controller
         ],500);
 
     }
+
+
+    public function unLike(Request $request){
+
+        $validatedData = $request->validate([
+            "fingerprint" => "required",
+            "user_agent" => "required",
+            "user_id" => "required"
+        ]);
+
+        $like = Like::where('fingerprint',$validatedData['fingerprint'])->where('user_agent',$validatedData['user_agent'])->where("user_id",$validatedData['user_id'])->first();
+
+        if($like->delete()) {
+            return response()->json([
+                'message' => 'you dislike this profile'
+            ],200);
+        }
+
+        return response()->json([
+            'message' => 'server error'
+        ],500);
+
+    }
 }
