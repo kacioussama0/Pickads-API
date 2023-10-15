@@ -19,12 +19,10 @@
 </style>
 
    <div class="container">
-       <h1>PickADS</h1>
-       <h2>Hello</h2>
-       <p>This button to reset Password</p>
-       <a href="http://localhost:5173/reset-password/{{$token}}">Reset Password</a>
-       <span>Thank you for choosing <a href="pickads.net">PickAds</a></span>
-       <p>Copyright © PickADS 2023 All rights reserved.</p>
+       <h1>Bonjour PickADS</h1>
+       <a href="https://pickads.net/reset-password/{{$token}}">réinitialiser le mot de passe</a>
+       <span>Merci d'avoir choisi <a href="pickads.net">PickAds</a></span>
+       <p>Copyright © PickADS 2023 Tous droits réservés.</p>
 
 
    </div>

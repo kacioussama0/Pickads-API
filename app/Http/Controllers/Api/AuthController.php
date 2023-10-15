@@ -18,7 +18,6 @@ class AuthController extends Controller
     public function register(Request $request) {
 
 
-
         $validatedData = $request->validate([
             'first_name' => 'required|max:35',
             'last_name' => 'required|max:35',
@@ -61,8 +60,8 @@ class AuthController extends Controller
             ];
 
             Mail::send('emails.register',['user'=>$userDetails],function ($message) use ($userDetails) {
-                $message->subject('You Registered Successfully in PickADS');
-                $message->from('contact@pickads.net');
+                $message->subject('Vous vous êtes inscrit avec succès dans PickADS');
+                $message->from('no-reply@pickads.net');
                 $message->to($userDetails['email']);
             });
 
@@ -87,13 +86,13 @@ class AuthController extends Controller
         ]);
 
         if(!auth()->attempt($validatedData,true)) {
-            return response()->json(['message' => 'invalid credentials'],401);
+            return response()->json(['message' => 'les informations invalides'],401);
         }
 
         $user = auth()->user();
 
         if($user['is_banned']) {
-            return response()->json(['message' => 'You Account Is Restricted'],401);
+            return response()->json(['message' => 'Votre compte est restreint'],401);
         }
 
         $accessToken = $user ->createToken('authToken')->accessToken;
@@ -113,7 +112,7 @@ class AuthController extends Controller
 
 
         if(!User::where('email',$credentials)->first()) {
-            return response()->json(["msg" => 'Email Not Exist'],404);
+            return response()->json(["msg" => 'L\'e-mail n\'existe pas'],404);
         }
 
         $token = Str::random();
@@ -127,12 +126,12 @@ class AuthController extends Controller
 
         Mail::send('emails.forget',['token' => $token],function ($message) use ($request) {
             $message->subject('Password Reset For Your Account');
-            $message->from('contact@pickads.net');
+            $message->from('no-reply@pickads.net');
             $message->to($request->email);
         });
 
 
-        return response()->json(["message" => 'Reset password link sent on your email.']);
+        return response()->json(["message" => 'Lien de réinitialisation du mot de passe envoyé sur votre e-mail.']);
 
     }
 
@@ -141,12 +140,12 @@ class AuthController extends Controller
         $token = $request->token;
         if(!$passwordResets = DB::table('password_reset_tokens')->where('token', $token)->first()) {
             return response()->json([
-                'message' => 'invalid token!',
+                'message' => 'jeton invalide!',
             ],400);
         }
 
         if(!$user = User::where('email', $passwordResets->email)->first()) {
-            return response()->json(["msg" => 'User Not Exist'],404);
+            return response()->json(["msg" => 'L\'utilisateur n\'existe pas'],404);
         }
 
         $validatedData = $request->validate([
@@ -159,7 +158,7 @@ class AuthController extends Controller
 
         if($user->save()) {
             DB::table('password_reset_tokens')->where('email',$user['email'])->delete();
-            return response()->json(["message" => 'Password Reset Successfully'],200);
+            return response()->json(["message" => 'Réinitialisation du mot de passe avec succès'],200);
         }
 
         return response()->json([
